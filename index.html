@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
+    crossorigin="anonymous"></script>
+
+<body>
+
+
+
+
+    <form id="hs-form-58aa731e-a644-43b3-9389-c9e2cfe99b44-ec884374-a6e7-4ab9-8fc8-57fbc3824a80"
+        class="hs-form-58aa731e-a644-43b3-9389-c9e2cfe99b44 hs-form hs-form_theme-canvas"
+        data-instance-id="1f2c7443-0f63-438e-8340-39cfb4051d4c" data-form-id="58aa731e-a644-43b3-9389-c9e2cfe99b44"
+        data-portal-id="8489989" lang="en" data-hs-cf-bound="true">
+        <div class="hs-form__pagination-content-container">
+            <div class="hs-form__row">
+                <div class="hs-form__group">
+                    <div class="hs-form__field-row">
+
+                        <div class="hs-form__field-row__column">
+                            <div class="hs-form__field hs-form__field-zip hs-zip"><label id="zip-label" for="zip-input"
+                                    class="hs-form__field__label hs-form__field__label--required"
+                                    data-required="true"><span>Postal code</span></label>
+                                <input id="zip-input" class="hs-form__field__input" type="text" name="zipcode"
+                                    required="" inputmode="text" aria-invalid="false" aria-labelledby="zip-label"
+                                    aria-describedby="zip-description" aria-required="true" value="">
+                            </div>
+                        </div>
+
+
+                        <div class="hs-form__field-row__column">
+                            <div class="hs-form__field hs-form__field-city hs-city"><label id="city-label"
+                                    for="city-input"
+                                    class="hs-form__field__label hs-form__field__label--required"><span>City</span></label>
+                                <input id="city-input" class="hs-form__field__input" type="text" name="city"
+                                   inputmode="text" aria-invalid="false"
+                                    aria-labelledby="city-label" aria-describedby="city-description"
+                                    aria-required="true" value="">
+                            </div>
+                        </div>
+                        <div class="hs-form__field-row__column">
+                            <div class="hs-form__field hs-form__field-state hs-state"><label id="state-label"
+                                    for="state-input"
+                                    class="hs-form__field__label hs-form__field__label--required"><span>State/Region</span></label>
+                                <input id="state-input" class="hs-form__field__input" type="text" name="state"
+                                " inputmode="text" aria-invalid="false"
+                                    aria-labelledby="state-label" aria-describedby="state-description"
+                                    aria-required="true" value="">
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="hs-form__row">
+                <div class="hs-form__group"></div>
+            </div>
+            <div class="hs-form__row">
+                <div class="hs-form__actions"><button type="submit" name="Submit"
+                        class="hs-form__actions__submit">Submit</button></div>
+            </div>
+        </div>
+    </form>
+
+
+    <script>//<![CDATA[
+        window.addEventListener('DOMContentLoaded', function () {
+            // IMPORTANT: Fill in your client key
+            var clientKey = "js-YHmp2v9Fnx1ZUVK099YvW943i9AhxhlFvKkNZsiBu5zr1HOjdm1GzxzH8Cl5ZzXR";
+
+            var cache = {};
+            var container = $("#hs-form-58aa731e-a644-43b3-9389-c9e2cfe99b44-ec884374-a6e7-4ab9-8fc8-57fbc3824a80");
+            var errorElem = container.find(".label-error");
+
+            /** Handle successful response */
+            function handleResp(data) {
+                // Check for error
+                if (data.error_msg)
+                    errorElem.text(data.error_msg);
+                else if ("city" in data) {
+                    // Set city and state
+                    container.find("input[name='city']").val(data.city);
+                    container.find("input[name='state']").val(data.state);
+                }
+            }
+
+            // Set up event handlers
+            container.find("input[name='zipcode']").on("keyup change", function () {
+                // Get zip code
+                var zipcode = $(this).val().substring(0, 5);
+                if (zipcode.length == 5 && /^[0-9]+$/.test(zipcode)) {
+                    // Clear error
+                    errorElem.empty();
+
+                    // Check cache
+                    if (zipcode in cache) {
+                        handleResp(cache[zipcode]);
+                    }
+                    else {
+                        // Build url
+                        var url = "https://www.zipcodeapi.com/rest/" + clientKey + "/info.json/" + zipcode + "/radians";
+
+                        // Make AJAX request
+                        $.ajax({
+                            "url": url,
+                            "dataType": "jsonp"
+                        }).done(function (data) {
+                            handleResp(data);
+
+                            // Store in cache
+                            cache[zipcode] = data;
+                        }).fail(function (data) {
+                            if (data.responseText && (json = $.parseJSON(data.responseText))) {
+                                // Store in cache
+                                cache[zipcode] = json;
+
+                                // Check for error
+                                if (json.error_msg)
+                                    errorElem.text(json.error_msg);
+                            }
+                            else
+                                errorElem.text('Request failed.');
+                        });
+                    }
+                }
+            }).trigger("change");
+        });
+        //]]></script>
+
+    <!-- <script src="./index.js"></script> -->
+</body>
+
+</html>
